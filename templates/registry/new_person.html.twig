@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Article{% endblock %}
+
+{% block body %}
+
+    <style>
+        label.required:before {
+            content: "* ";
+            color: red;
+        }
+    </style>
+
+    <h2>Dodawanie osoby do kartoteki</h2>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+    <br>
+
+    <b style="color: #ff0000;">*</b> - pole obowiązkowe
+
+    <br>
+    <br>
+
+    <a href="/persons/">Wróć do kartotek</a>
+{% endblock %}

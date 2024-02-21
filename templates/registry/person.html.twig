@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{%  block title %}Blog Articles{% endblock %}
+
+{% block body %}
+    <h1>Kartoteka osobowa {{ person.name }} {{ person.surname }}</h1>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="/persons/remove/{{ person.id }}">
+            <button type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+        </a>
+    {% endif %}
+    {% if is_granted('ROLE_MOD') %}
+        <a href="/persons/edit/{{ person.id }}">
+            <button type="button" class="btn btn-primary"><i class="fas fa-edit"></i></button>
+        </a>
+    {% endif %}
+    {% if person %}
+        <table style="width:100%; margin-top: 5px">
+            <tr>
+                <th style="width: 15%; background: rgba(106,144,164,0.2); padding: 10px">Dane osobowe</th>
+            </tr>
+            <tr>
+                <td>Imię</td>
+                <td>{{ person.name }}</td>
+            </tr>
+            <tr>
+                <td>Nazwisko</td>
+                <td>{{ person.surname }}</td>
+            </tr>
+            <tr>
+                <td>Narodziny</td>
+                {% if person.birth %}
+                    <td>{{ person.birth|date('d.m.Y') }}</td>
+                {% else %}
+                    <td><i>Brak informacji</i></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>Płeć</td>
+                {% if person.sex is not null %}
+                    <td>{{ person.sex|sex }}</td>
+                {% else %}
+                    <td><i>Brak informacji</i></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <a data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <th style="width: 15%; background: rgba(106,144,164,0.2); padding: 10px">Wygląd</th>
+                </a>
+            </tr>
+            <tr>
+                <td>Wzrost</td>
+                {% if person.height %}
+                    <td>{{ person.height }} cm</td>
+                {% else %}
+                    <td><i>Brak informacji</i></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>Kolor skóry</td>
+                {% if person.skin %}
+                    <td>{{ person.skin|skin }}</td>
+                {% else %}
+                    <td><i>Brak informacji</i></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>Waga</td>
+                {% if person.weight %}
+                    <td>{{ person.weight }} kg</td>
+                {% else %}
+                    <td><i>Brak informacji</i></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th style="width: 15%; background: rgba(106,144,164,0.2); padding: 10px">Inne</th>
+            </tr>
+            <tr>
+                <td>Data ostatniej zmiany</td>
+                <td>{{ person.edited|date('d.m.Y') }}</td>
+            </tr>
+            <tr>
+                <td>Stworzono</td>
+                <td>{{ creator_name }} - {{ person.added|date('d.m.Y') }}</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <h1 style="font-size: 20px">Wpisy w kartotece</h1>
+            <a href="/persons/view/{{ person.id }}/addfile"><button type="button" class="btn btn-info btn-sm">Dodaj nowy wpis</button></a>
+        {% if files %}
+            <table class="table table-hover">
+                <thead>
+                    <tr class="header">
+                        <th scope="col" style="width: 5%">ID</th>
+                        <th scope="col" style="width: 15%">Typ</th>
+                        <th scope="col" style="width: 30%">Dodano</th>
+                        <th scope="col">Treść</th>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <th scope="col">Inne</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                        {% if not file.hidden %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>
+                            {% if file.type == 0 %}
+                                Drogowy
+                            {% elseif file.type == 1 %}
+                                Karny
+                            {% elseif file.type == 2 %}
+                                Inny
+                            {% endif %}
+                            </td>
+                            <td>
+                                {{ file.created|date('d.m.Y') }}
+                                <br>
+                                <span style="font-size: 11px"><a href="#">{{ file.creator|username }}</a></span>
+                            </td>
+                            <td>{{ file.content }}</td>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <td>
+                                <a href="/files/hide/{{ file.id }}"><span class="badge badge-pill badge-success">Public</span></a>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <tr class="table-danger">
+                                    <td>{{ file.id }}</td>
+                                    <td>
+                                        {% if file.type == 0 %}
+                                            Drogowy
+                                        {% elseif file.type == 1 %}
+                                            Karny
+                                        {% elseif file.type == 2 %}
+                                            Inny
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ file.created|date('d.m.Y') }}
+                                        <br>
+                                        <span style="font-size: 11px"><a href="#">{{ file.creator|username }}</a></span>
+                                    </td>
+                                    <td>{{ file.content }}</td>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                    <td>
+                                        <a href="/files/hide/{{ file.id }}"><span class="badge badge-pill badge-warning">Ukryte</span></a>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-dismissible alert-warning">
+                <h4 class="alert-heading">Brak wpisów</h4>
+                <p class="mb-0">Nie znaleziono żadnych wpisów. <a href="{{ person.id }}/addfile">Dodaj nowy wpis.</a></p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-dismissible alert-danger">
+            <strong>Wystąpił błąd!</strong> Taka osoba nie istnieje.
+        </div>
+    {% endif %}
+
+    <br><br><br><br><br>
+
+    <a href="/persons"><button type="button" class="btn btn-outline-warning">Wróć do kartoteki</button></a>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/main.js"></script>
+{% endblock %}

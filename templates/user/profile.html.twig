@@ -1,0 +1,125 @@
+{# index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %} Podgląd profilu {{ user.username }} {% endblock %}
+
+{% block body %}
+    <h1 style="font-size: 23px">
+        Podgląd profilu <b>{{ user.username }}</b> (UID: {{ user.id }})
+        {% if app.user == user %}
+        <button type="button" style="padding: 3px;" class="btn btn-info disabled" disabled>YOU</button>
+        {% endif %}
+    </h1>
+
+    <table class="table table-hover">
+        <tr>
+            <th scope="col" style="width: 15%">Nazwa użytkownika</th scope="col">
+            <td>{{ user.username }}</td>
+        </tr>
+        <tr>
+            <th scope="col">Dane osobowe</th>
+            <td>{{ user.fullname }}</td>
+        </tr>
+        <tr>
+            <th scope="col">Ranga</th>
+            <td>
+                {{ user.role|role }}
+            </td>
+        </tr>
+    </table>
+
+    {% if app.user == user or app.user.role >= 2 %}
+            <a href="#settings" data-toggle="collapse" href="#settings" role="button" aria-expanded="false" aria-controls="settings">
+                <h2 style="font-size: 23px; color: #222; text-decoration: none;">Ustawienia <i class="fas fa-arrow-down"></i></h2>
+            </a>
+
+        <div class="collapse" id="settings">
+            <button data-toggle="modal" data-target="#exampleModalCenter" type="button" class="btn btn-warning">Zmiana hasła</button>
+            {% if app.user.role >= 2 and app.user != user %}
+                <button type="button" class="btn btn-danger">Usuń konto</button>
+                <button type="button" class="btn btn-info">Blokuj</button>
+            {% endif %}
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Zmiana hasła</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Zamknij">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="changepass" class="form-group has-success">
+                            <label class="form-control-label">Wprowadź nowe hasło</label>
+
+                            <input type="password" class="form-control is-invalid" id="passinput" oninput="validatePassword()" required>
+
+                            <div class="valid-feedback">Hasło jest poprawne.</div>
+                            <div class="invalid-feedback">Hasło musi mieć minimum 8 znaków.</div>
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        <button type="button" class="btn btn-primary" id="change" onclick="changePassword();" disabled>Zmień</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function validatePassword() {
+                let input = document.getElementById('passinput');
+                let btn = document.getElementById('change');
+
+                if(input.value.length >= 8) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+
+                    btn.disabled = false;
+
+                    return true;
+                } else {
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+
+                    btn.disabled = true;
+
+                    return false;
+                }
+            }
+
+            function changePassword() {
+                let password = document.getElementById('passinput').value;
+
+                if(validatePassword() && password != null) {
+                    let container = document.getElementById('changepass');
+                    container.innerHTML = '<div class="spinner-border text-primary"></div>';
+
+                    let request = new XMLHttpRequest();
+
+                    request.onreadystatechange = function() {
+                        if(this.readyState === 4) {
+                            if(this.status === 200) {
+                                container.innerHTML = `<div class="alert alert-dismissible alert-success"><i class="far fa-check-circle"></i> Zmiana hasła przebiegła pomyślnie.</div>`;
+                            } else {
+                                alert(this.responseText);
+                                container.innerHTML = `<div class="alert alert-dismissible alert-danger"><i class="fas fa-exclamation-circle"></i> Wystąpił błąd podczas zmiany hasła. (kod ${this.status})</div>`;
+                            }
+
+                            document.getElementById('change').remove();
+                        }
+                    };
+
+                    request.open("POST", "changepassword/"+{{ user.id }}, true);
+                    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    request.send("password="+password);
+                }
+            }
+        </script>
+    {% endif %}
+{% endblock %}

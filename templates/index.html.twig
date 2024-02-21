@@ -1,0 +1,70 @@
+{# index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+
+    <style>
+        .file {
+            height: 100px;
+            width: 367px;
+            background: #444;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #000;
+        }
+
+        .filetext {
+            font-weight: 200;
+            font-size: 21px;
+            color: #fff;
+        }
+    </style>
+
+    <div style="padding: 10px; border: 1px solid #a4cfa4; background: #ebfcdf">
+        Zalogowany na koncie <b>{{ app.user.username }}</b>!
+        <br>
+        <span style="font-size: 14px">Warstwa uprawnień: <i>{{ role }}</i></span>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <center>
+        <img src="https://i.imgur.com/2sxqmRm.png" style="width: 220px;">
+        <h1>Los Santos Police Department</h1>
+        <h2 style="font-size: 21px;">Database</h2>
+        <b>Dostępne moduły</b>
+        <hr>
+    </center>
+    <div style="display: inline-block">
+        <div class="file" style="background: url('https://imgur.com/5Sp0gTO.png')">
+            <p class="filetext">Kartoteka osób</p>
+
+            <a href="/persons">
+                <span class="badge badge-pill badge-info">Przejdź</span>
+            </a>
+        </div>
+        {% if app.user.role >= 2 %}
+        <div class="file" style="background: url('https://imgur.com/41v9WQh.png')">
+            <p class="filetext">Użytkownicy</p>
+
+            <a href="/users">
+                <span class="badge badge-pill badge-info">Przejdź</span>
+            </a>
+            <br>
+            <span class="badge badge-pill badge-danger">Admin only</span>
+        </div>
+        {% endif %}
+        <!--<div class="file" style="background: url('https://imgur.com/wjOQtCa.png')">
+            <p class="filetext">Zarekwirowane przedmioty</p>
+
+            <a href="/items">
+                <span class="badge badge-pill badge-info">Przejdź</span>
+            </a>
+        </div>-->
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New user{% endblock %}
+
+{% block body %}
+
+    <style>
+        label.required:before {
+            content: "* ";
+            color: red;
+        }
+    </style>
+
+    <h2>Tworzenie nowego konta</h2>
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+    <br>
+
+    <b style="color: #ff0000;">*</b> - pole obowiązkowe
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{%  block title %}database{% endblock %}
+
+{% block body %}
+    <h1 style="margin-bottom: 0px;">LSPD - Command Staff</h1>
+    <h1 style="font-size: 15px;">Sekcja pracowników</h1>
+
+    {% if not error %}
+        Wszystkich rekordów: {{ pagination.getTotalItemCount }}
+        <table id="persons" style="margin-top: 5px; width: 30%" class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Użytkownik
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in pagination %}
+                <tr>
+                    <td>
+                        {{ user.id }}
+                    </td>
+                    <td>
+                        <a href="/profile/{{ user.id}}">{{ user.fullname }} <span style="font-size: 11px">({{ user.username }})</span></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {{ knp_pagination_render(pagination) }}
+
+    {% else %}
+        <div class="alert alert-dismissible alert-danger" style="margin-top: 30px">
+            <h4 class="alert-heading">Wystąpił błąd</h4>
+            <p class="mb-0">{{ error }}</p>
+        </div>
+    {% endif %}
+
+    <a href="/users/add">
+        <button type="button" class="btn btn-danger">Stwórz nowe konto</button>
+    </a>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/main.js"></script>
+{% endblock %}

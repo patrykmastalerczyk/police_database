@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{%  block title %}database{% endblock %}
+
+{% block body %}
+    <h1 style="margin-bottom: 0px;">Los Santos Police Department</h1>
+    <h1 style="font-size: 15px;">Database - sekcja osób</h1>
+
+    <a href="/persons/add">
+        <button type="button" class="btn btn-danger">Dodaj nową osobę</button>
+    </a>
+
+    <div>
+        <form method="post" class="form-inline my-2 my-lg-0" style="float: right; margin-bottom: 5px;">
+            <input class="form-control mr-sm-2" type="text" name="name" placeholder="Dane osobowe">
+            <button class="btn btn-secondary my-2 my-sm-0" type="submit">Szukaj</button>
+        </form>
+    </div>
+
+    <br>
+
+    {% if not error %}
+        Wszystkich rekordów: {{ pagination.getTotalItemCount }}
+        <table id="persons" style="margin-top: 5px;" class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Dane osobowe
+                </th>
+                <th>
+                    Akcje
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for person in pagination %}
+                <tr>
+                    <td>
+                        {{ person.id }}
+                    </td>
+                    <td>
+                        {{ person.name }} {{ person.surname }}
+                    </td>
+                    <td>
+                        <a href="/persons/view/{{ person.id}}">
+                            <button type="button" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </a>
+                        {% if app.user.role >= 2 %}
+                            <a href="/persons/remove/{{ person.id}}">
+                                <button type="button" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </a>
+                        {% endif %}
+                        {% if app.user.role >= 1 %}
+                        <a href="/persons/edit/{{ person.id}}">
+                            <button type="button" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {{ knp_pagination_render(pagination) }}
+
+    {% else %}
+        <div class="alert alert-dismissible alert-danger" style="margin-top: 30px">
+            <h4 class="alert-heading">Wystąpił błąd</h4>
+            <p class="mb-0">{{ error }}</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/main.js"></script>
+{% endblock %}
